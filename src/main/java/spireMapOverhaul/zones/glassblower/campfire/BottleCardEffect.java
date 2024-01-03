@@ -19,6 +19,7 @@ import com.megacrit.cardcrawl.rooms.CampfireUI;
 import com.megacrit.cardcrawl.rooms.RestRoom;
 import com.megacrit.cardcrawl.vfx.AbstractGameEffect;
 import com.megacrit.cardcrawl.vfx.cardManip.ShowCardAndObtainEffect;
+import com.megacrit.cardcrawl.vfx.cardManip.ShowCardBrieflyEffect;
 import spireMapOverhaul.zones.glassblower.patches.MakeDamageMethodUseEffectsQueuePatch;
 
 public class BottleCardEffect  extends AbstractGameEffect {
@@ -43,9 +44,9 @@ public class BottleCardEffect  extends AbstractGameEffect {
 
         if (!AbstractDungeon.isScreenUp && !AbstractDungeon.gridSelectScreen.selectedCards.isEmpty()) {
             AbstractCard card = AbstractDungeon.gridSelectScreen.selectedCards.get(0);
-            //todo: do vfx
-            CardModifierManager.addModifier(card, new InnateMod());
 
+            CardModifierManager.addModifier(card, new InnateMod());
+            AbstractDungeon.topLevelEffectsQueue.add(new ShowCardBrieflyEffect(card.makeStatEquivalentCopy(), Settings.WIDTH/2f, Settings.HEIGHT/2f));
             AbstractDungeon.topLevelEffectsQueue.add(new AbstractGameEffect() {
                 @Override
                 public void update() {
