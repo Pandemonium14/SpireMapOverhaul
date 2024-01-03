@@ -4,5 +4,11 @@
       "Glassblower's Workshop",
       "The vast workshop of a legendary glassblower. Their brittle creations still roam these halls."
     ]
+  },
+  "${ModID}:BottleCardCampfireOption": {
+    "TEXT": [
+      "Bottle a card.",
+      "Receive 15% of your max HP in damage to make a card Innate."
+    ]
   }
 }
