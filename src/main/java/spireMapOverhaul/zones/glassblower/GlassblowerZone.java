@@ -2,14 +2,19 @@ package spireMapOverhaul.zones.glassblower;
 
 import com.badlogic.gdx.graphics.Color;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.ui.campfire.AbstractCampfireOption;
 import spireMapOverhaul.abstracts.AbstractZone;
 import spireMapOverhaul.zoneInterfaces.CampfireModifyingZone;
+import spireMapOverhaul.zoneInterfaces.CombatModifyingZone;
+import spireMapOverhaul.zoneInterfaces.EncounterModifyingZone;
 import spireMapOverhaul.zones.glassblower.campfire.BottleCardOption;
+import spireMapOverhaul.zones.glassblower.monsters.GlassGolem;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class GlassblowerZone extends AbstractZone implements CampfireModifyingZone {
+public class GlassblowerZone extends AbstractZone implements CampfireModifyingZone, EncounterModifyingZone {
 
     public static final String ID = "Glassblower";
 
@@ -37,9 +42,9 @@ public class GlassblowerZone extends AbstractZone implements CampfireModifyingZo
     }
 
     @Override
-    public void postUseCampfireOption(AbstractCampfireOption option) {
-        if (option instanceof BottleCardOption) {
-
-        }
+    public List<AbstractMonster> getAdditionalMonsters() {
+        ArrayList<AbstractMonster> l = new ArrayList<>();
+        l.add(new GlassGolem());
+        return l;
     }
 }
