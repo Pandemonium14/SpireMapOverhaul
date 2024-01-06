@@ -14,7 +14,7 @@ import spireMapOverhaul.zones.glassblower.monsters.GlassGolem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GlassblowerZone extends AbstractZone implements CampfireModifyingZone, EncounterModifyingZone {
+public class GlassblowerZone extends AbstractZone implements CampfireModifyingZone, EncounterModifyingZone, CombatModifyingZone {
 
     public static final String ID = "Glassblower";
 
@@ -46,5 +46,15 @@ public class GlassblowerZone extends AbstractZone implements CampfireModifyingZo
         ArrayList<AbstractMonster> l = new ArrayList<>();
         l.add(new GlassGolem());
         return l;
+    }
+
+    @Override
+    public void onMonsterDeath(AbstractMonster monster) {
+        for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+            if (m instanceof GlassGolem) {
+                ((GlassGolem)m).onMonsterDeath();
+                return;
+            }
+        }
     }
 }

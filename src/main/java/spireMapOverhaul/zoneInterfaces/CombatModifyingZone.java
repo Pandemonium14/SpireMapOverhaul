@@ -1,5 +1,7 @@
 package spireMapOverhaul.zoneInterfaces;
 
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
+
 public interface CombatModifyingZone {
     /*
      * These methods mirror their relic counterparts and generally happen after them.
@@ -22,6 +24,8 @@ public interface CombatModifyingZone {
     default void atRoundEnd() {}
 
     default void onVictory() {}
+
+    default void onMonsterDeath(AbstractMonster monster) {}
 
     /**
      * Returns a String that will be displayed when hovering a button during combat to explain modifications to it.

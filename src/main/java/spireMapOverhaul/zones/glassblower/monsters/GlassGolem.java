@@ -113,6 +113,19 @@ public class GlassGolem extends AbstractSMOMonster {
         }
     }
 
+    public void onMonsterDeath() {
+        boolean isAlone = true;
+        for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+            if (!(m instanceof GlassGolem) && !m.isDeadOrEscaped()) {
+                isAlone = false;
+            }
+        }
+        if (isAlone) {
+            escape();
+            escapeTimer = 2.0f;
+        }
+    }
+
     @Override
     public void update() {
         super.update();

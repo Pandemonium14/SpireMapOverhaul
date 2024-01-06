@@ -4,11 +4,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.*;
 import com.evacipated.cardcrawl.modthespire.patcher.PatchingException;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.OverlayMenu;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.localization.UIStrings;
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.ui.panels.DrawPilePanel;
@@ -128,6 +130,25 @@ public class CombatModifierPatches {
         public static void patch() {
             if(!hideButton)
                 combatBtn.update();
+        }
+    }
+
+    @SpirePatch2(clz = AbstractMonster.class, method = "die", paramtypez = {boolean.class})
+    public static class OnMonsterDeath {
+        @SpireInsertPatch(locator = Locator.class)
+        public static void patch(AbstractMonster __instance, boolean triggerRelics) {
+            if (triggerRelics) {
+                Wiz.forCurZone(CombatModifyingZone.class, z -> {
+                    z.onMonsterDeath(__instance);
+                });
+            }
+        }
+
+        private static class Locator extends SpireInsertLocator {
+            public int[] Locate(CtBehavior ctMethodToPatch) throws CannotCompileException, PatchingException {
+                Matcher finalMatcher = new Matcher.FieldAccessMatcher(AbstractMonster.class, "currentHealth");
+                return LineFinder.findInOrder(ctMethodToPatch, finalMatcher);
+            }
         }
     }
 }
