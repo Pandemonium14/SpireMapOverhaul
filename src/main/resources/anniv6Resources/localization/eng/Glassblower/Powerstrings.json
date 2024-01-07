@@ -1,0 +1,6 @@
+{
+  "${ModID}:GlassProtectPower": {
+    "NAME": "Protected",
+    "DESCRIPTIONS": ["The next time this takes damage, the ", " takes the damage instead."]
+  }
+}

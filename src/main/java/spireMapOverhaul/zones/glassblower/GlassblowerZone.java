@@ -19,7 +19,7 @@ public class GlassblowerZone extends AbstractZone implements CampfireModifyingZo
     public static final String ID = "Glassblower";
 
     public GlassblowerZone() {
-        super(ID, Icons.MONSTER, Icons.ELITE, Icons.REWARD, Icons.REST);
+        super(ID, Icons.MONSTER, Icons.REST);
         width = 4;
         height = 4;
     }

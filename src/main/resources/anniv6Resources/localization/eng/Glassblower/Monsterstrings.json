@@ -1,0 +1,10 @@
+{
+    "${ModID}:GlassGolem": {
+        "MOVES": [
+          "Fade Away",
+          "Ghostly Touch",
+          "Absorb Life"
+        ],
+        "NAME": "Glass Golem"
+    }
+}

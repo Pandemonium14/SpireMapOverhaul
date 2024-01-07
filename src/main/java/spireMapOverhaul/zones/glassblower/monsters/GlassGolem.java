@@ -1,11 +1,15 @@
 package spireMapOverhaul.zones.glassblower.monsters;
 
+import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.animations.FastShakeAction;
 import com.megacrit.cardcrawl.actions.common.*;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.DamageInfo;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.localization.MonsterStrings;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.powers.DrawReductionPower;
 import com.megacrit.cardcrawl.powers.MinionPower;
@@ -14,6 +18,7 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import spireMapOverhaul.SpireAnniversary6Mod;
 import spireMapOverhaul.abstracts.AbstractSMOMonster;
 import spireMapOverhaul.zones.glassblower.actions.StealCardAction;
+import spireMapOverhaul.zones.glassblower.powers.GlassProtectPower;
 import spireMapOverhaul.zones.invasion.powers.DrawReductionSingleTurnPower;
 
 import java.util.ArrayList;
@@ -22,18 +27,20 @@ import java.util.Iterator;
 public class GlassGolem extends AbstractSMOMonster {
 
     public static final String ID = SpireAnniversary6Mod.makeID("GlassGolem");
+    private static final MonsterStrings monsterStrings = CardCrawlGame.languagePack.getMonsterStrings(ID);
+    public static final String NAME = monsterStrings.NAME;
+    public static final String[] MOVES = monsterStrings.MOVES;
 
     //moves
     private static final byte WAIT = 1;
     private static final byte REVIVE = 2;
     private static final byte STEAL = 3;
-
-    public ArrayList<AbstractCard> stolenCards = new ArrayList<>();
+    private static final byte PROTECT = 4;
 
     private static final boolean canDie = false;
 
     public GlassGolem() {
-        super("To Localize", ID, 10, 0, 0, 100, 100, SpireAnniversary6Mod.makeImagePath("monsters/GlassGolem/GlassGolem.png"));
+        super(NAME, ID, 10, 0, 0, 100, 100, null);
         loadAnimation(SpireAnniversary6Mod.makeImagePath("monsters/GlassGolem/skeleton.atlas"),
                 SpireAnniversary6Mod.makeImagePath("monsters/GlassGolem/skeleton.json"), 1.5f);
         type = EnemyType.NORMAL;
@@ -61,6 +68,24 @@ public class GlassGolem extends AbstractSMOMonster {
                 addToBot(new ApplyPowerAction(AbstractDungeon.player, this, new DrawReductionSingleTurnPower(AbstractDungeon.player, 1)));
                 addToBot(new StealCardAction(this));
                 break;
+            case PROTECT:
+                GlassGolem protector = this;
+                addToBot(new AbstractGameAction() {
+                    @Override
+                    public void update() {
+                        ArrayList<AbstractMonster> monsters = new ArrayList<>();
+                        for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+                            if (!(m instanceof GlassGolem) && !m.isDeadOrEscaped()) {
+                                monsters.add(m);
+                            }
+                        }
+                        int r = AbstractDungeon.aiRng.random(monsters.size() - 1);
+                        addToTop(new ApplyPowerAction(monsters.get(r), protector, new GlassProtectPower(monsters.get(r), protector)));
+                        isDone = true;
+                    }
+                });
+                break;
+
             default: {}
         }
         firstMove = false;
@@ -72,9 +97,9 @@ public class GlassGolem extends AbstractSMOMonster {
         if (halfDead) {
             setMove(REVIVE, Intent.BUFF);
         } else {
-            if (firstMove) {
-                setMove(STEAL, Intent.DEBUFF);
-            } else {
+            if (lastMove(STEAL)) {
+                setMove(PROTECT, Intent.BUFF);
+            } else{
                 setMove(STEAL, Intent.DEBUFF);
             }
         }
@@ -95,14 +120,20 @@ public class GlassGolem extends AbstractSMOMonster {
 
             powers.clear();
 
+            for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+                if (m.hasPower(GlassProtectPower.POWER_ID)) {
+                    addToTop(new RemoveSpecificPowerAction(m,m, m.getPower(GlassProtectPower.POWER_ID)));
+                }
+            }
+
             if (this.nextMove != 4) {
                 this.setMove(WAIT, Intent.SLEEP);
                 this.createIntent();
-                AbstractDungeon.actionManager.addToBottom(new SetMoveAction(this, REVIVE, Intent.BUFF));// 222
+                AbstractDungeon.actionManager.addToBottom(new SetMoveAction(this, REVIVE, Intent.BUFF));
             }
-        } else if (info.owner != null && info.type != DamageInfo.DamageType.THORNS && info.output > 0) {// 231
-            this.state.setAnimation(0, "Hit", false);// 232
-            this.state.addAnimation(0, "Idle", true, 0.0F);// 233
+        } else if (info.owner != null && info.type != DamageInfo.DamageType.THORNS && info.output > 0) {
+            this.state.setAnimation(0, "Hit", false);
+            this.state.addAnimation(0, "Idle", true, 0.0F);
         }
     }
 
